@@ -1,0 +1,30 @@
+Team 6 project structure
+
+traffic-safety-system/
+├── index.php                    Public homepage
+├── report.php                   Citizen report form
+├── submit_report.php            Validation, upload and database insert
+├── report_submitted.php         Shows newly generated reference number
+├── track.php                    Reference + email status lookup
+├── setup_admin.php              One-time first administrator setup (delete after setup)
+├── evidence.php                 Protected evidence image response for signed-in authority users
+├── config/
+│   ├── config.php               Local database settings and base URL
+│   └── database.php             PDO database connection
+├── includes/
+│   ├── bootstrap.php            Session and common includes
+│   ├── functions.php            Escaping, CSRF, helpers and status labels
+│   ├── header.php               Shared navigation and alerts
+│   └── footer.php               Shared footer
+├── admin/
+│   ├── login.php                Authority login
+│   ├── logout.php               Sign out
+│   ├── dashboard.php            Summary dashboard
+│   ├── reports.php              Search/filter report list
+│   ├── view_report.php          Detail and status history
+│   ├── update_report.php        Protected review update
+│   └── analytics.php            Category, status and location summaries
+├── database/schema.sql          Tables and indexes
+├── assets/css/style.css         Responsive design system
+├── assets/js/main.js            Small progressive enhancements
+└── storage/evidence/.htaccess   Prevents direct web access to evidence files

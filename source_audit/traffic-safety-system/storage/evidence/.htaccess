@@ -1,0 +1,2 @@
+# Do not allow direct web access to stored evidence files.
+Require all denied

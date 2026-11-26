@@ -1,0 +1,545 @@
+ZEAL EDUCATION SOCIETY'S
+ZEAL COLLEGE OF ENGINEERING AND RESEARCH
+Narhe, Pune - 41  |  Department of Information Technology
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOFTWARE REQUIREMENTS
+SPECIFICATION
+INTELLIGENT TRAFFIC VIOLATION REPORTING
+AND ROAD SAFETY MANAGEMENT SYSTEM
+
+TEAM 6  •  PROJECT SRS  •  VERSION 1.0
+
+Faculty Guide: Prof. Mangesh Devkate (D5-03)
+
+DOCUMENT CONTROL
+Document information and reading guide
+
+Contents at a glance
+
+
+
+01 • INTRODUCTION
+1. Introduction
+1.1 Purpose
+This Software Requirements Specification describes the expected behaviour, interfaces, data, quality attributes and acceptance conditions for the Intelligent Traffic Violation Reporting and Road Safety Management System. It is intended for the student development team, faculty guide, reviewers and test users. It establishes a shared baseline before Sprint 1 implementation.
+1.2 Project background
+Traffic violations and unsafe road behaviour can be difficult to report consistently when evidence, location and follow-up are scattered across channels. The proposed web application provides a structured mechanism for citizens to submit a report with an image and location, for authorised traffic personnel to review submissions, and for administrators to observe patterns in reports and accident-prone areas.
+1.3 Objectives
+Provide a simple citizen-facing process to submit a traffic-violation report with time, type, location and optional supporting evidence.
+Create a reference number and transparent status history so a reporter can track their own submission.
+Provide an authorised review workflow before a report is treated as verified or used to prepare an enforcement notice.
+Support configurable offence rules and penalty values rather than embedding changeable amounts in program code.
+Show aggregated, location-based patterns and summary analytics to help authorities identify potential road-safety hotspots.
+Maintain access control, audit history and privacy boundaries appropriate to a student prototype handling potentially sensitive reports.
+1.4 Intended audience and conventions
+Requirements are labelled FR for functional requirements, NFR for non-functional requirements, BR for business rules and TC for test cases. “Must” indicates a requirement needed for acceptance; “should” indicates a recommended capability. IDs are stable references for discussions and tests.
+1.5 Product sheet features carried forward
+
+
+02 • OVERALL DESCRIPTION
+2. Overall product description
+2.1 Product perspective
+The system is a browser-accessible web application with a citizen portal, an officer review workspace and an administrator console. It uses PHP for server-side workflow and business logic, MySQL for persistent structured data, and HTML5, CSS3, JavaScript and Bootstrap for responsive user interfaces. A map provider and email/SMS delivery provider may be connected through replaceable adapters; the exact provider is a project decision, not fixed by the allocation sheet.
+2.2 System boundary
+
+2.3 High-level outcomes
+
+2.4 Design principles
+Human review before enforcement action; automated steps may assist but do not replace authorised decision-making.
+Privacy by default: reporter details, exact evidence and vehicle identifiers are visible only to authorised users on a need-to-know basis.
+Traceability: record important status transitions, rule changes and notice actions with actor and timestamp.
+Accessible and responsive pages that remain usable on common desktop and mobile browsers.
+
+02 • ROLES AND PERMISSIONS
+3. User classes and access permissions
+The role model below is the minimum proposed permission baseline. Administrative access must not be granted merely because a user knows a URL; permissions must be enforced on the server for every protected action.
+
+3.1 Account requirements
+Each account has a unique internal user ID and a verified unique email or approved login identifier.
+Passwords are stored as salted hashes using a modern password-hashing function provided by the runtime; plaintext passwords are never stored or logged.
+Role changes, account deactivation and password resets are restricted to approved workflows.
+After repeated failed sign-in attempts, the system should apply rate limiting and may temporarily delay further attempts.
+A user can sign out, and protected sessions expire after a configured period of inactivity.
+
+
+03 • ENVIRONMENT AND INTERFACES
+4. Operational environment and external interfaces
+4.1 Runtime environment
+
+4.2 User interface requirements
+The navigation must clearly separate citizen reporting/tracking pages from restricted officer/admin workspaces.
+Required fields must be labelled and field-level errors must explain how to correct an input.
+The interface must provide loading, success, empty, failure and permission-denied states.
+Colour must not be the only signal for status; pair status colours with text labels/icons.
+Pages should adapt to narrow screens without horizontal scrolling for core forms.
+4.3 External interface definitions
+
+
+04 • FUNCTIONAL REQUIREMENTS
+5. Functional requirements
+Requirements are grouped by module. Each requirement is testable and should be tracked in the team backlog. The priority labels are proposed for delivery planning: P1 = core, P2 = important, P3 = optional enhancement.
+5.1 Authentication and account management
+
+5.2 Violation reporting
+
+
+
+04 • FUNCTIONAL REQUIREMENTS
+5.3 Evidence handling and officer review
+
+5.4 Review outcomes and state transitions
+
+Figure 1. Proposed status lifecycle; final statuses and transitions should be agreed with the faculty guide.
+A record may move to UNDER REVIEW only after submission. NEED INFO returns the next action to the reporter; the case may re-enter review after the requested information is supplied. REJECTED and CANCELLED are terminal for the current record unless an authorised reopening process is explicitly implemented. NOTICE ISSUED is permitted only after the configured authorisation checks pass.
+
+04 • FUNCTIONAL REQUIREMENTS
+5.5 Offence rules, notices and penalty management
+
+
+5.6 Notifications and tracking
+FR-033 / P1: Show the reporter a clear timeline of their report status, last updated time and any action requested from them.
+FR-034 / P2: Provide in-app notifications when a material state transition occurs.
+FR-035 / P3: Support optional email/SMS notifications if provider credentials, consent and templates are configured.
+FR-036 / P1: Notifications must contain only the minimum necessary details and must not reveal confidential case notes or another person’s personal data.
+
+04 • FUNCTIONAL REQUIREMENTS
+5.7 Maps, hotspot analysis and dashboards
+
+5.8 Administration, audit and data lifecycle
+
+
+05 • USE CASES AND PROCESS MODELS
+6. Use case model
+
+Figure 2. Role-to-capability model grouped by citizen, officer and administrator workspaces.
+6.1 Principal use case descriptions
+
+
+05 • PROCESS MODELS
+7. End-to-end report workflow
+
+Figure 3. Proposed report-to-enforcement workflow. Legal/enforcement actions require authorised review.
+7.1 Narrative process
+Capture: the reporter enters a category, observed time, location and a concise description; optional vehicle information must be treated carefully.
+Validate: the server validates required fields, time ranges, coordinate ranges, content type and file size. A rejected upload does not create a falsely successful submission.
+Register: the system commits the report, evidence metadata and initial status together as far as practical, then returns a unique tracking reference.
+Review: a permitted officer checks context and evidence. The system provides request-information, verify and reject actions and maintains history.
+Notice: when a verified report maps to a valid offence rule, the system can create a draft. Issuance requires a permitted actor and confirmation of the rule and case state.
+Learn: aggregated counts and coordinates can support hotspot analysis. The interface must distinguish citizen reports from verified outcomes and confirmed accidents.
+7.2 Context-level data flow
+
+Figure 4. Context diagram showing the system boundary and optional provider interfaces.
+
+06 • SYSTEM DESIGN
+8. Proposed system architecture
+
+Figure 5. Logical architecture using the assigned technology stack.
+8.1 Component responsibilities
+
+8.2 Key design decisions
+Use prepared statements or a trusted database abstraction for all SQL involving user input.
+Keep business rules in server-side services rather than duplicating them only in JavaScript.
+Use random/unpredictable public tracking references that do not expose sequential internal database IDs.
+Keep evidence storage references separate from public URLs; serve files only after access checks.
+Use transactions when a state change must be recorded together with status history, notice data or audit entries.
+
+
+06 • DATA MODEL
+9. Logical data model
+
+Figure 6. Simplified entity-relationship diagram; the cardinality summary appears beneath the model.
+9.1 Core entities and relationships
+
+9.2 Data integrity principles
+Use foreign keys for the relationships that must not become orphaned.
+Use unique constraints for login identifiers and public tracking references.
+Store money using an exact decimal type, not floating point; store currency explicitly if multiple jurisdictions are possible.
+Store latitude and longitude as decimal values with range checks; latitude must be -90 to 90 and longitude -180 to 180.
+Store timestamps consistently (UTC on server/database is recommended) and format them for users in the configured time zone.
+Avoid storing evidence binaries inside ordinary report text fields; use protected storage and metadata records.
+
+06 • DATA DICTIONARY
+10. Proposed database schema
+The following fields are a logical baseline, not a mandatory vendor-specific migration script. Field lengths, indexes and privacy/retention constraints should be reviewed during implementation.
+10.1 USERS
+
+10.2 VIOLATIONS and EVIDENCE_FILES
+
+
+06 • DATA DICTIONARY
+10.3 REVIEW, RULE, NOTICE and HISTORY tables
+
+10.4 Suggested indexes
+users(email) unique; violations(public_reference) unique; violations(status, submitted_at); violations(violation_type, observed_at).
+violations(reporter_id, submitted_at) for a reporter’s own history; violations(assigned_officer_id, status) for the review queue.
+evidence_files(violation_id); reviews(violation_id, reviewed_at); challans(notice_reference) unique and challans(status, due_date).
+Coordinate/spatial indexing can be added if the chosen MySQL version and map query workload justify it; otherwise filter candidate records by date/status before aggregating.
+10.5 Initial categories (configurable)
+Potential reporting categories for the prototype include signal violation, unsafe/illegal parking, helmet or seat-belt non-compliance, wrong-side driving, mobile phone use while driving, dangerous manoeuvre, speeding evidence and other/unsure. These are UI examples only; authorised categories and legally applicable offence mappings must be confirmed before enforcement workflows are enabled.
+
+07 • INTERFACE CONCEPTS
+11. Proposed user-interface wireframes
+These are illustrative low-fidelity layouts to align requirements and discussion. They are not screenshots of an existing application. Labels, limits and page actions may be refined during sprint implementation.
+11.1 Citizen report form
+
+Figure 7. Citizen report screen: required fields, location preview and evidence panel.
+11.2 Tracking page
+
+Figure 8. Tracking screen: reference lookup, state and timeline.
+
+07 • INTERFACE CONCEPTS
+11.3 Authority dashboard
+
+Figure 9. Authority view: summary indicators, location map and review queue (demo placeholders).
+11.4 UI behaviour and validation messages
+
+11.5 Accessibility and responsive design
+Provide visible keyboard focus and logical tab order for forms and dialogs.
+Use meaningful labels, headings, alt text and table headers; controls must have accessible names.
+Maintain readable contrast and do not rely on red/green alone to communicate status.
+Use Bootstrap breakpoints to stack multi-column forms on small screens; retain access to core submit and tracking actions.
+
+08 • QUALITY AND SECURITY REQUIREMENTS
+12. Non-functional requirements
+
+12.1 Application security controls
+Validate and normalise all input on the server; encode output according to its HTML/attribute/JavaScript context to reduce cross-site scripting risk.
+Use CSRF tokens for state-changing browser forms and secure, HttpOnly, SameSite session cookies where supported.
+Use password hashing, least privilege, session expiry, login rate limiting and secure error handling.
+Upload checks: extension allow-list, actual MIME/content checks, size/count limits, random storage name, storage outside web root, access-control check on downloads.
+Use prepared SQL statements; do not concatenate user input into queries or shell commands.
+Protect configuration secrets; do not put DB passwords or API keys in source control.
+Audit sensitive actions without logging passwords, tokens, raw uploaded content or unnecessary personally identifying information.
+
+09 • RULES AND CONSTRAINTS
+13. Business rules, assumptions and constraints
+13.1 Business rules
+
+13.2 Assumptions
+Citizens and authority users have access to a browser and network connection.
+The initial prototype has a limited set of manually maintained offence categories and rules.
+Officer accounts are provisioned or approved by an administrator; open self-registration for enforcement roles is prohibited.
+Any use of real personal data, vehicle identifiers or real enforcement action needs faculty and relevant authority approval.
+Map and message provider credentials may not be available; the core application must degrade gracefully without them.
+13.3 Constraints and dependencies
+The required technology stack is PHP, MySQL, HTML5, CSS3, JavaScript and Bootstrap.
+The student project schedule is short; prioritise report submission, review, tracking, core notices and a basic hotspot/dashboard flow before optional integrations.
+The project sheet does not define jurisdiction-specific penalties, identity verification rules, payment processing or official police-system API access; these remain unconfirmed.
+A real-world deployment would require secure hosting, operational monitoring, data governance and appropriate approval beyond a classroom demonstration.
+
+
+10 • VERIFICATION AND ACCEPTANCE
+14. Verification and acceptance test matrix
+The following scenarios are the initial acceptance baseline. Expected results should be recorded with test evidence during the sprint review. Add browser/device details and test data IDs in the team test log.
+
+14.1 Exit criteria for sprint acceptance
+All P1 functional requirements implemented in the sprint pass their linked tests or have an explicitly recorded defect.
+No known critical security or data-integrity defect remains open for the demo.
+The team demonstrates citizen submission, authorised review, status tracking and the minimum dashboard workflow end-to-end.
+Test results, known limitations and outstanding work are documented for the faculty guide.
+
+10 • DEPLOYMENT AND DELIVERY
+15. Deployment plan, delivery milestones and risks
+15.1 Proposed deployment plan
+1.  Prepare the PHP runtime, MySQL database, web server configuration and environment variables.
+2.  Apply schema migrations and seed only demo accounts, configurable offence examples and synthetic report records.
+3.  Configure HTTPS for remote hosting; restrict database access and protected file storage; remove debug output.
+4.  Test sign-in, core role permissions, report workflow, database persistence, evidence upload and restore process.
+5.  Deploy to the agreed demonstration environment, perform smoke tests and maintain a rollback copy of the prior working version.
+6.  Use clearly labelled synthetic/demo records for the academic presentation; do not present example dashboard values as live government data.
+15.2 Internship schedule alignment
+
+15.3 Risks and mitigations
+
+
+11 • APPENDIX
+16. Glossary and traceability
+
+16.1 Requirement traceability overview
+
+16.2 Source basis and proposed design details
+Source-derived facts: project title, four headline capabilities and PHP/MySQL/HTML5/CSS3/JavaScript/Bootstrap stack are taken from the supplied team allocation graphic. Team identity, faculty guide and internship schedule are taken from the supplied internship allocation notice. The role model, detailed requirements, database schema, wireframes, test cases, security controls and workflow refinements are the team’s proposed engineering baseline and require review/approval.
+
+11 • REVIEW AND APPROVAL
+17. Review checklist and approval
+Use this checklist during the team meeting with the faculty guide. Mark the status after discussion; the document is a baseline draft until the scope and jurisdiction-specific decisions are confirmed.
+☐  Project title, objectives and scope boundaries accepted.
+☐  Required roles and permissions accepted.
+☐  Report fields, evidence limits and location workflow accepted.
+☐  Officer review states and status transitions accepted.
+☐  Offence rules, penalty handling and authority required to issue a notice clarified.
+☐  Map provider / fallback approach selected.
+☐  Personal data, evidence retention and demo-data policy agreed.
+☐  P1/P2/P3 scope and sprint ownership agreed.
+☐  Acceptance tests assigned to team members.
+☐  Deployment environment, backup and final demo plan agreed.
+Approval record
+
+
+Academic Details | Project Team
+Programme: S.Y. B.Tech (Direct Second Year)
+Department: Information Technology
+Academic Year: 2026–2027
+Document Date: 14 October 2026 | IT2375  Kaustubh Patil Vishnu
+IT2376  Rampure Mayuri Mahadev
+IT2377  Sathe Samiksha Sunil
+IT2378  Sidral Pranjali Laxminarayan
+IT2379  Shinde Smith Yuvraj
+Field | Value
+Document title | Software Requirements Specification (SRS)
+System name | Intelligent Traffic Violation Reporting and Road Safety Management System
+Document ID | TEAM6-IT-SRS-01
+Version / status | 1.0 / Initial team draft for faculty review
+Prepared by | Team 6, Department of Information Technology
+Faculty guide | Prof. Mangesh Devkate (D5-03)
+Primary stack | PHP, MySQL, HTML5, CSS3, JavaScript, Bootstrap
+Baseline source | Team project allocation sheet and internship team/schedule notice, AY 2026–2027
+Section | Coverage
+01 | Introduction, purpose and scope
+02 | Overall product description and user roles
+03 | Operational environment and external interfaces
+04 | Functional requirements
+05 | Use cases and process models
+06 | System architecture and data model
+07 | Interface concepts / wireframes
+08 | Non-functional requirements, security and validation
+09 | Business rules, constraints and assumptions
+10 | Verification, acceptance tests and deployment plan
+11 | Glossary, references and approval
+Scope note  This SRS converts the project sheet into a practical software baseline. Features marked as proposed design detail should be reviewed with the faculty guide before implementation.
+Feature from project allocation | SRS interpretation
+Citizen reporting with photo and location | Structured report form, validated evidence upload, map/address location and tracking ID.
+Automatic ticket generation and penalty management | After authorised verification, create a notice/challan draft from an active offence rule; issuing remains permission-gated.
+Hotspot mapping | Aggregate report/incident coordinates into map markers or clusters; display counts and date filters.
+Authority dashboards and reports | Role-restricted queue, status counts, offence summaries and exportable reports.
+Inside the project boundary | Outside the baseline boundary
+User registration / sign-in and role checks | Direct access to police department production systems
+Report submission, evidence metadata and tracking | Automated legal determination from an image alone
+Officer review, request-more-information, confirm/reject | Guarantee that a citizen submission is legally sufficient evidence
+Rule-configured penalty/notice draft and authorised issue record | Real payment collection or settlement unless later approved
+Map display and aggregated hotspot reports | Guaranteed real-time sensor, CCTV or vehicle-registration feeds
+User | Expected outcome
+Citizen / reporter | Submit a complete report, receive a tracking reference, see the status of their own report and any request for additional information.
+Traffic officer / reviewer | Review submissions, examine permitted evidence, record reasons, resolve duplicates, and take authorised case actions.
+Traffic administrator | Maintain authorised users, activate offence rules, view aggregated analytics, manage system configuration and audit activity.
+System operator (optional) | Monitor backups, access failures, storage capacity and application health without unnecessary access to case contents.
+Capability | Citizen | Officer / reviewer | Administrator
+Register / sign in | Yes | Provisioned or approved | Provisioned
+Create and submit own report | Yes | Optional if enabled | No routine need
+View own report status | Yes | Assigned / authorised queue | All cases as needed
+Read full evidence and reporter details | Own submission scope only | Authorised case scope | Authorised support scope
+Review, request details, confirm or reject | No | Yes | Optional / oversight
+Create / issue official notice | No | Only with assigned authority | Only if explicitly permitted
+Manage offence rules / penalty table | No | No | Yes
+Manage users and roles | No | No | Yes
+View anonymised hotspot analytics | Limited public view if approved | Yes | Yes
+View audit logs / configuration | No | Limited case audit | Yes
+Privacy requirement  The tracking page must not expose a reported vehicle owner’s identity, address, phone number, complete evidence set or another user’s report history.
+Component | Baseline requirement / note
+Client device | Desktop or smartphone with a modern, supported browser and an internet connection.
+Frontend | HTML5 semantic markup, CSS3, Bootstrap responsive grid/components, JavaScript for client-side enhancements.
+Application server | PHP runtime configured for production-like error handling; PHP version to be selected based on hosting availability and support.
+Database | MySQL relational database; enforce primary keys, foreign keys, unique constraints and indexes where appropriate.
+Web server / transport | Apache or Nginx may be used; HTTPS is required for any non-local deployment handling accounts or evidence.
+Evidence storage | Store uploaded media outside executable web paths or in a controlled object/file store; database stores metadata and protected storage references.
+Mapping | A mapping adapter may display coordinates, markers and hotspot aggregation. Provider/API key and terms are configuration dependencies.
+Notifications | In-app status updates are baseline. Email/SMS delivery is optional and depends on configured service credentials.
+Interface | Data exchanged | Failure / fallback behaviour
+Map provider | Latitude/longitude, marker coordinates, viewport and optional geocoding query | Allow manual address/coordinate entry where permitted; show a clear unavailable-map message.
+Email/SMS provider (optional) | Destination and minimal message template | Keep the event in-app; log a delivery failure without exposing report content in logs.
+Official enforcement system (not baseline) | Only an approved, authorised integration could exchange case/notice identifiers | Do not represent a local notice record as an official e-challan unless the authority integration confirms it.
+ID / priority | Requirement
+FR-001 / P1 | The system must allow an eligible user to register with the required account fields and reject duplicate login identifiers.
+FR-002 / P1 | The system must authenticate registered users and show a generic sign-in failure message that does not disclose whether an email exists.
+FR-003 / P1 | The system must enforce role-based access control on protected pages and server actions.
+FR-004 / P1 | The system must allow users to sign out and expire inactive sessions after a configurable timeout.
+FR-005 / P2 | The system should support a secure password-reset or administrator-assisted reset workflow.
+FR-006 / P1 | The system must record security-relevant events such as repeated failed sign-ins, role updates and account deactivation.
+ID / priority | Requirement
+FR-007 / P1 | The system must present a report form containing violation category, observed date/time, location, description and optional vehicle registration where known.
+FR-008 / P1 | The system must require the minimum mandatory fields and explain each missing or invalid field before accepting the report.
+FR-009 / P1 | The system must allow the reporter to provide a location by map pin, coordinates or text address, subject to the selected mapping capability.
+FR-010 / P1 | The system must assign a unique, non-sequential tracking reference to each accepted submission.
+FR-011 / P1 | The system must show a receipt containing the reference ID, submission timestamp and current status.
+FR-012 / P2 | The system should warn about possible duplicates based on configurable signals such as time window, location proximity and category; a warning must not automatically reject a report.
+FR-013 / P1 | The system must permit a reporter to view the status of their own submission after authentication or an approved secure verification step.
+Acceptance focus  A report must not be considered accepted until required fields are validated, media checks pass where media is supplied, and a reference ID has been committed.
+ID / priority | Requirement
+FR-014 / P1 | The system must accept only configured file types (initially JPG/JPEG and PNG) and enforce configurable file-size and count limits.
+FR-015 / P1 | The server must validate the file content and type; extension checks alone are insufficient. Unsafe, corrupt or oversized files must be rejected.
+FR-016 / P1 | Uploaded evidence must be stored using an unpredictable server-side filename, with database metadata linking it to a report.
+FR-017 / P1 | The system must show each new submission in an authorised review queue with reference ID, category, time, location summary and status.
+FR-018 / P1 | An authorised reviewer must be able to open permitted evidence, record a decision and add a reason or internal note.
+FR-019 / P1 | The reviewer must be able to mark a report as requiring additional information, with a clear request visible to the reporter.
+FR-020 / P1 | The reviewer must be able to mark a report as verified or rejected. A rejection must have a reason selected or entered.
+FR-021 / P1 | The system must retain status history with previous status, new status, actor and timestamp for material transitions.
+FR-022 / P2 | The system should allow assignment of a case to an authorised officer and show unassigned / assigned workload.
+FR-023 / P2 | The system should provide a controlled duplicate-linking action while preserving the original report records and audit trail.
+ID / priority | Requirement
+FR-024 / P1 | The system must maintain a configurable offence-rule catalogue containing offence code/name, description, jurisdiction, penalty value or range, active flag and effective dates.
+FR-025 / P1 | Only authorised administrators may add, edit, activate, deactivate or schedule offence rules; changes must be audited.
+FR-026 / P1 | For a verified report mapped to an active rule, the system must be able to generate a notice/challan draft populated with the report reference, rule, amount and required case metadata.
+FR-027 / P1 | Before issue, the system must verify that the actor has permission, the report is in an eligible state, the rule is active for the offence date and the amount is valid.
+FR-028 / P1 | The system must record the notice status, generated reference, approving/issuing actor and timestamps.
+FR-029 / P2 | The system should support configurable due date and overdue indicators without hard-coding one jurisdiction’s deadlines.
+FR-030 / P1 | The system must support authorised status updates such as DRAFT, PENDING APPROVAL, ISSUED, DISPUTED, PAID (manual/confirmed), CANCELLED and OVERDUE where applicable.
+FR-031 / P1 | The system must not claim that a locally generated notice is an official government e-challan unless an approved official integration confirms issuance.
+FR-032 / P2 | The system should permit an authorised officer to record a dispute, correction or cancellation with reason and an audit entry.
+Legal and operational boundary  Penalty amounts and enforceable procedures depend on the applicable jurisdiction and authorised rules. This SRS does not prescribe legal penalties. The project baseline creates a configurable record and requires authorised review before issue.
+ID / priority | Requirement
+FR-037 / P1 | The system must display reports on a map when valid coordinates exist and the map component is available.
+FR-038 / P1 | The system must let authorised users filter map/report summaries by date range, category, status and available geographic area.
+FR-039 / P1 | The system must aggregate report counts by configurable grid, neighbourhood or geographic grouping for hotspot views.
+FR-040 / P1 | Hotspot visualisations must describe the metric and time window; reports alone must not be labelled as confirmed accidents unless the source data supports that interpretation.
+FR-041 / P1 | The authority dashboard must show counts such as submitted, pending review, verified, rejected and notices issued for the selected period.
+FR-042 / P2 | The dashboard should show trends by offence category and time interval, and may highlight unusual increases for human review.
+FR-043 / P2 | Authorised users should be able to export filtered aggregate reports to CSV or print-friendly format.
+FR-044 / P1 | Public-facing analytics, if enabled, must be aggregated and must hide reporter identity, full evidence and unnecessary vehicle identifiers.
+FR-045 / P1 | Analytics must use stored timestamps consistently and clearly state the selected reporting period and date/time zone.
+ID / priority | Requirement
+FR-046 / P1 | The administrator must be able to activate/deactivate accounts and apply an approved role without directly editing database rows.
+FR-047 / P1 | The system must record audit entries for case decisions, notice actions, offence-rule changes, user/role changes and sensitive data access where feasible.
+FR-048 / P1 | Audit entries must include actor ID, event type, timestamp, object reference and a minimal before/after summary where needed.
+FR-049 / P2 | The system should offer configurable retention and deletion/anonymisation rules for old reports and evidence, subject to institutional approval.
+FR-050 / P1 | The system must provide a backup-and-restore procedure for the database and evidence store, and the team must test a sample restore before deployment.
+Use case | Primary actor | Preconditions | Main success path / outcome
+UC-01 Submit report | Citizen | User is signed in; report form available. | Enter details, choose location, attach evidence if available, review privacy note, submit; system validates and returns a tracking ID.
+UC-02 Track report | Citizen | A valid report reference is available and the user is permitted to view it. | Open tracking page; system shows current state, timeline and any request for additional information.
+UC-03 Review report | Officer | Officer is authenticated and authorised for the case. | Open queue, inspect evidence and details, check potential duplicate, record decision/reason, save; audit and history are updated.
+UC-04 Prepare notice | Authorised officer | Case is verified; active offence rule exists; actor has issue authority. | System creates a draft from the selected rule; authorised actor validates details and approves/ issues; the case records the notice reference.
+UC-05 View hotspots | Officer / admin | User has analytics permission; location data is available. | Choose period and filters; system aggregates coordinates, renders map/summary and indicates the dataset/time window.
+UC-06 Manage offence rules | Admin | Admin role confirmed. | Create or edit rule values and effective dates; validate values; save with an audit event.
+Component | Responsibilities
+Presentation layer | Responsive forms, navigation, client-side convenience checks, table/map rendering and accessible feedback. Client-side validation improves usability but does not replace server-side checks.
+PHP application layer | Authentication, role checks, validation, report workflow, evidence metadata, rule lookup, notice state transitions, analytics queries and audit entry creation.
+MySQL data layer | Structured entities, relations, status history, uniqueness constraints, indexes and transactions for operations that must remain consistent.
+Evidence storage | Private storage of allowed files, generated filenames, access checks, metadata and optional integrity hash.
+Optional integrations | Mapping/geocoding and notification services behind a provider abstraction, with timeout handling and safe fallback.
+Technology compliance  The baseline stack is PHP + MySQL + HTML5 + CSS3 + JavaScript + Bootstrap, as shown for Team 6. Any additional libraries or services should be documented and approved before adoption.
+Entity | Purpose | Primary relationship
+Users | Accounts, roles and identity metadata. | One user can submit many violations; a reviewer can review many cases.
+Violations | The submitted report, location, offence category, timestamps and current status. | Parent record for evidence, reviews, notices and status history.
+Evidence_Files | Protected file metadata and storage reference. | Many evidence files may belong to one violation.
+Reviews | Officer decisions, reasons and review timestamps. | Each review is linked to one violation and one reviewer.
+Offence_Rules | Configurable offence catalogue, jurisdiction and penalty values. | A notice refers to the selected active rule.
+Challans / Notices | Prepared and issued notice records, amounts and current state. | Usually zero or one current notice per verified violation in the baseline; exceptions require explicit handling.
+Status_History | Traceable history of report state transitions. | Many entries per violation.
+Notifications / Audit | Delivery events and security/business audit events. | Linked to the relevant user, object or actor where applicable.
+Field | Type (proposed) | Rules / meaning
+user_id | BIGINT, PK | Internal identifier; not exposed as a public tracking code.
+full_name | VARCHAR(120) | Required for human accounts; validate length.
+email | VARCHAR(190), UNIQUE | Normalised login/contact identifier where enabled.
+mobile | VARCHAR(20), NULL | Optional or required only if the approved notification workflow needs it.
+password_hash | VARCHAR(255) | Hash only; never plaintext.
+role | ENUM / lookup FK | CITIZEN, OFFICER, ADMIN; role changes audited.
+account_status | ENUM | PENDING, ACTIVE, DISABLED or equivalent.
+created_at / updated_at | DATETIME | Set by server; do not trust client-supplied timestamps.
+Table / field | Type (proposed) | Rules / meaning
+violations.violation_id | BIGINT, PK | Internal key.
+public_reference | VARCHAR(32), UNIQUE | Random, non-sequential tracking reference.
+reporter_id | BIGINT, FK users | Required; preserve ownership for access checks.
+assigned_officer_id | BIGINT, FK users, NULL | Must refer to an active officer when assigned.
+violation_type | VARCHAR / FK | Controlled category from configured values.
+description | TEXT | Length-limited; sanitise when rendered.
+observed_at / submitted_at | DATETIME | Observed time and server submission time are separate.
+location_text / latitude / longitude | VARCHAR + DECIMAL | Location text may be incomplete; coordinates optional but validated if supplied.
+vehicle_registration | VARCHAR(20), NULL | Optional, normalised if collected; treat as sensitive.
+status | ENUM / lookup FK | Controlled state; transitions validated server-side.
+evidence_files.evidence_id | BIGINT, PK | File metadata identifier.
+violation_id | BIGINT, FK violations | Parent report.
+storage_key / mime_type / size_bytes / sha256 | VARCHAR / numeric | Private key, validated type, size and optional integrity digest.
+Table / field group | Proposed fields | Constraints / notes
+reviews | review_id PK; violation_id FK; reviewer_id FK; decision; reason_code; notes; reviewed_at | One record per review action; use append-only review history where possible.
+offence_rules | rule_id PK; offence_code; offence_name; jurisdiction; description; penalty_amount DECIMAL; currency; active_flag; effective_from; effective_to | No overlapping active rules for the same offence/jurisdiction/date unless explicitly supported.
+challans / notices | challan_id PK; violation_id FK; rule_id FK; notice_reference UNIQUE; amount DECIMAL; due_date; status; issued_by FK; issued_at | Notice creation and issue must be permission-checked; keep correction/cancellation trace.
+status_history | history_id PK; violation_id FK; old_status; new_status; changed_by FK; change_reason; changed_at | Insert on every material status transition; restrict update/delete.
+notifications | notification_id PK; user_id FK; event_type; channel; delivery_status; created_at; delivered_at | Do not store secrets or include excessive personal/case details in message body.
+audit_logs | audit_id PK; actor_id FK; event_type; object_type; object_id; timestamp; minimal change summary | Access-controlled; avoid logging passwords, authentication tokens, or full evidence contents.
+Situation | Expected user feedback
+Required field missing | Show the field name and a short correction message next to the field; preserve safe inputs.
+Location service unavailable | Explain that the map is unavailable and offer permitted manual location entry.
+Evidence rejected | State the allowed formats/size limit; do not reveal server paths or stack traces.
+Report successfully submitted | Display the reference, timestamp, status and safe next steps; avoid duplicate submission on refresh.
+Access denied | Show a generic permission message and return to a safe page; do not reveal internal case details.
+No records match filters | Show an empty-state message and let authorised users clear or adjust filters.
+Save failure | Explain that the change was not confirmed; retain form data if safe and allow retry without duplicate actions.
+ID | Quality attribute | Requirement / measurable target
+NFR-001 | Performance | Under a representative student-demo load and indexed database, common page actions should usually complete within 3 seconds, excluding slow external map/notification providers. Measure during testing.
+NFR-002 | Availability | For the academic prototype, deployment availability depends on the hosting environment; the team must document expected demo uptime and planned maintenance.
+NFR-003 | Usability | A first-time tester should be able to submit a valid report without oral help, using clear labels, inline validation and a final review step.
+NFR-004 | Compatibility | Core flows must be tested on at least one current Chromium-based browser and one additional supported browser or mobile viewport.
+NFR-005 | Security | All non-local traffic carrying credentials or evidence uses HTTPS; role checks are server-side; SQL uses parameterised queries.
+NFR-006 | Privacy | Collect only needed personal data; protect evidence; restrict case details; provide an approved retention approach before public deployment.
+NFR-007 | Integrity | Status and notice transitions must validate allowed prior states and use transactions where related writes must be consistent.
+NFR-008 | Auditability | Important decisions and configuration changes are timestamped and attributed to an actor; ordinary users cannot edit audit events.
+NFR-009 | Maintainability | Separate presentation, workflow/service logic, database access and configuration; avoid hard-coded secrets and penalty values.
+NFR-010 | Scalability | Filter and aggregate data server-side; paginate long queues and reports; add indexes based on observed query plans.
+NFR-011 | Recovery | Document scheduled backups for MySQL and evidence storage; perform and record at least one restore test before final demo.
+NFR-012 | Accessibility | Aim for keyboard operability, clear labels, contrast and text-based status indicators in all core workflows.
+ID | Rule
+BR-001 | A tracking reference is generated only for a submission accepted by server-side validation.
+BR-002 | The report status can only change through the approved workflow; direct client-side status edits are ignored.
+BR-003 | Only an authorised reviewer may verify or reject a report; a rejection requires a recorded reason.
+BR-004 | A notice draft requires a verified report and an active offence rule applicable to the offence date and jurisdiction.
+BR-005 | Issuing a notice requires an authorised role and a successful validation of case state, rule and amount.
+BR-006 | Rule changes and notice cancellations/corrections must be attributable and auditable.
+BR-007 | Hotspot counts must specify the selected period and data basis and must not imply causation.
+BR-008 | Public views may show aggregated reports but must not disclose reporter identities or protected case evidence.
+BR-009 | A possible duplicate is a review aid, not automatic proof that a report is false.
+BR-010 | Date/time, currency, penalty and data-retention settings should be configurable rather than inferred from the server locale.
+Explicit assumption  This SRS describes a student project prototype. It does not authorise actual enforcement, payment collection, surveillance or access to restricted governmental datasets.
+Test ID | Test scenario / test data | Expected result
+TC-001 | Register using a valid unique email; then attempt the same email again. | First registration follows the configured flow; duplicate identifier is rejected with a clear message.
+TC-002 | Sign in with valid credentials, then use an invalid password. | Valid login opens the permitted workspace; invalid login reveals no account-existence detail.
+TC-003 | Submit report with required category, observed time and location, with no optional vehicle number. | Submission is accepted if all required rules pass; receipt shows a unique tracking reference.
+TC-004 | Submit with missing required location or invalid coordinate range. | Submission is blocked and field-level feedback explains the correction.
+TC-005 | Upload oversized or disallowed file, and then upload valid JPG/PNG. | Invalid file is rejected safely; valid file is stored under a protected key and metadata is linked to the report.
+TC-006 | Citizen attempts to open another user’s report by changing reference/ID. | Access is denied or the same generic not-found response is returned; no private details are disclosed.
+TC-007 | Officer reviews a submitted report and requests more information. | Status/history record the transition and request; reporter sees the request in tracking view.
+TC-008 | Officer attempts to issue a notice for an unverified report. | Action is blocked server-side and the event is handled safely.
+TC-009 | Admin deactivates an offence rule; officer tries to create a notice from it. | Draft/issue action is blocked or requires a permitted exception flow; reason is clear.
+TC-010 | Authorised user verifies a report and prepares notice with a valid active rule. | Notice draft uses configured rule/amount; issue action requires proper permission and records actor/time.
+TC-011 | Apply dashboard filters for status and date range. | Counts/map/list reflect the same filter window; empty results are shown clearly.
+TC-012 | Load records with coordinates and view hotspot map. | Markers/aggregates appear when mapping is available; labels identify time period and report basis.
+TC-013 | Map/notification provider is unavailable. | Core report/status work remains usable; user receives safe fallback feedback.
+TC-014 | Attempt SQL injection / HTML script payload in free-text field. | Payload does not change query structure or execute when displayed; request is validated/encoded.
+TC-015 | Restore database and evidence backup into a test environment. | Restored records and file references are consistent; the team records the restore outcome.
+Date(s) per allocation notice | Scheduled activity | SRS-related deliverable / checkpoint
+13 Oct 2026 | Title finalisation and SRS creation | Approve project scope, actors, requirements, diagrams and initial test cases.
+14–16 Oct 2026 | Sprint 1 work | Implement project skeleton, account/role baseline and core report submission.
+17 Oct 2026 | Sprint 1 testing, modification and bug fixes | Run report, validation, permission and upload tests; record defects.
+19–20 Oct and 27 Oct 2026 | Sprint 2 work | Implement officer workflow, tracking, rules/notices and dashboard/map baseline.
+28 Oct 2026 | Sprint 2 testing, modification and bug fixes | Retest state transitions, access control and analytics; close priority defects.
+29 Oct 2026 | Merge Sprint 1 and Sprint 2; bug fixes | Regression test integrated application and backup/restore.
+30 Oct 2026 | Project deployment | Deploy to the agreed demo environment and run smoke tests.
+31 Oct 2026 | Final presentation | Demonstrate end-to-end flows, SRS traceability and known limitations.
+Risk | Impact | Mitigation
+Unclear legal penalties / notice authority | Incorrect or misleading enforcement record | Use configurable sample rules; require authorised review; label prototype records clearly.
+Sensitive evidence exposure | Privacy and trust harm | Private file storage, strict access checks, minimal logs, synthetic demo evidence and deletion/retention plan.
+Map provider/API unavailable | Hotspot feature incomplete | Use a map adapter and manual coordinates; keep reporting/review flows functional.
+Inconsistent status changes | Incorrect queue and notice state | Centralise transition validation; transactionally write state history; test invalid transitions.
+Schedule pressure | Core features unfinished | Prioritise P1 end-to-end flow and defer SMS/payment/official integrations.
+Database or evidence loss | Broken reports and unusable demo | Back up both stores and test restoration before deployment.
+Term | Meaning in this SRS
+SRS | Software Requirements Specification: the agreed description of system behaviour and quality requirements.
+Violation report | A citizen-submitted record describing an observed traffic-related incident or suspected offence.
+Evidence | An uploaded supporting file and associated metadata; its existence does not automatically prove a violation.
+Tracking reference | A unique, non-sequential identifier used by an authorised reporter to find their submission.
+Officer / reviewer | A user authorised to inspect reports and record review outcomes.
+Offence rule | A configurable entry mapping an offence category and applicable jurisdiction/date to an approved penalty or notice rule.
+Notice / challan | A record prepared or issued through an authorised workflow; it is not necessarily an official e-challan unless confirmed by an approved integration.
+Hotspot | An area with a comparatively high count of reports or confirmed incidents for a specified time window and metric.
+RBAC | Role-based access control: permissions are assigned according to a user’s role.
+Audit log | A restricted record of security-relevant or material system actions, including actor and timestamp.
+P1 / P2 / P3 | Proposed priority labels: core, important and optional enhancement.
+Project-sheet feature | Requirements | Primary verification
+Citizen reports with photos and location | FR-007 to FR-016; FR-033 | TC-003 to TC-006
+Automatic ticket generation and penalty management | FR-024 to FR-032 | TC-008 to TC-010
+Hotspot mapping | FR-037 to FR-040 | TC-011 to TC-013
+Authority dashboards and analytics | FR-041 to FR-045 | TC-011 to TC-012
+Role-based / reliable handling proposed by SRS | FR-001 to FR-006; FR-046 to FR-050; NFR-005 to NFR-011 | TC-001, TC-002, TC-006, TC-014, TC-015
+Role | Name | Signature / remarks | Date
+Faculty guide | Prof. Mangesh Devkate |  | 
+Team representative | Kaustubh Patil Vishnu |  | 
+Other reviewer / coordinator |  |  | 
+Document status  Version 1.0 is prepared for review and discussion. Record accepted changes in the next version and keep requirements, implementation and test evidence aligned.

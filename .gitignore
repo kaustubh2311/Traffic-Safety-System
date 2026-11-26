@@ -1,0 +1,24 @@
+# PHP / local runtime
+*.log
+.env
+.env.local
+vendor/
+
+# XAMPP / local server
+xampp/
+*.bat
+
+# Uploaded evidence (contains user content)
+source_audit/traffic-safety-system/storage/evidence/*
+!source_audit/traffic-safety-system/storage/evidence/.htaccess
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Database dumps and secrets
+*.sql.gz
+*.sqlite
+*.sqlite3
+`n# Project archive`n*.zip
