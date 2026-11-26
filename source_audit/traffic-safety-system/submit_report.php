@@ -94,7 +94,7 @@ try {
     $pdo = db();
     $pdo->beginTransaction();
     $reference = '';
-    $insert = $pdo->prepare('INSERT INTO reports (reference_no, reporter_name, reporter_email, vehicle_number, violation_type, location_text, incident_at, latitude, longitude, citizen_id, description, evidence_path, status, created_at, updated_at) VALUES (:reference_no, :reporter_name, :reporter_email, :vehicle_number, :violation_type, :location_text, :incident_at, :latitude, :longitude, :citizen_id, :description, :evidence_path, :status, NOW(), NOW())');
+    $insert = $pdo->prepare('INSERT INTO reports (reference_no, reporter_name, reporter_email, vehicle_number, violation_type, location_text, incident_at, latitude, longitude, citizen_id, description, evidence_path, status, created_at, updated_at) VALUES (:reference_no, :reporter_name, :reporter_email, :vehicle_number, :violation_type, :location_text, :incident_at, :latitude, :longitude, :citizen_id, :description, :evidence_path, :status, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');
     // A random suffix makes references difficult to guess; retry in the unlikely event of a collision.
     for ($attempt = 0; $attempt < 4; $attempt++) {
         $reference = 'TSR-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
@@ -106,7 +106,7 @@ try {
         }
     }
     $reportId = (int)$pdo->lastInsertId();
-    $history = $pdo->prepare('INSERT INTO report_status_history (report_id, old_status, new_status, notes, changed_by, changed_at) VALUES (?, NULL, ?, ?, NULL, NOW())');
+    $history = $pdo->prepare('INSERT INTO report_status_history (report_id, old_status, new_status, notes, changed_by, changed_at) VALUES (?, NULL, ?, ?, NULL, CURRENT_TIMESTAMP)');
     $history->execute([$reportId, 'Submitted', 'Report created by citizen submission.']);
     $pdo->commit();
     unset($_SESSION['report_old'], $_SESSION['report_errors']);

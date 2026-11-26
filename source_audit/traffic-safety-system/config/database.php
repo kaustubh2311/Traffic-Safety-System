@@ -19,7 +19,12 @@ function db(): PDO {
         if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
             http_response_code(503); exit('Database unavailable. Configure DB_HOST, DB_NAME, DB_USER, DB_PASS and DB_PORT in Vercel.');
         }
-        $pdo = new PDO('sqlite:' . sys_get_temp_dir() . '/traffic_safety_demo.sqlite', [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+        $pdo = new PDO(
+            'sqlite:' . sys_get_temp_dir() . '/traffic_safety_demo.sqlite',
+            null,
+            null,
+            [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]
+        );
         $pdo->exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, full_name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'citizen', created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, reference_no TEXT NOT NULL UNIQUE, reporter_name TEXT NOT NULL, reporter_email TEXT NOT NULL, vehicle_number TEXT NOT NULL, violation_type TEXT NOT NULL, location_text TEXT NOT NULL, incident_at TEXT NULL, latitude REAL NULL, longitude REAL NULL, citizen_id INTEGER NULL, description TEXT NOT NULL, evidence_path TEXT NULL, status TEXT NOT NULL DEFAULT 'Submitted', officer_notes TEXT NULL, penalty_amount REAL NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS report_status_history (id INTEGER PRIMARY KEY AUTOINCREMENT, report_id INTEGER NOT NULL, old_status TEXT NULL, new_status TEXT NOT NULL, notes TEXT NULL, changed_by INTEGER NULL, changed_at TEXT DEFAULT CURRENT_TIMESTAMP);

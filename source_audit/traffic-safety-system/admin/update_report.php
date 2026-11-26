@@ -23,15 +23,16 @@ if ($penaltyInput !== '') {
 }
 try {
     $pdo = db(); $pdo->beginTransaction();
-    $lookup = $pdo->prepare('SELECT status, citizen_id, reporter_email, reference_no FROM reports WHERE id = ? FOR UPDATE'); $lookup->execute([$id]); $old = $lookup->fetch();
+    $lookup = $pdo->prepare('SELECT status, citizen_id, reporter_email, reference_no FROM reports WHERE id = ?');
+    $lookup->execute([$id]); $old = $lookup->fetch();
     if (!$old) { $pdo->rollBack(); flash('error', 'Report not found.'); redirect('admin/reports.php'); }
-    $update = $pdo->prepare('UPDATE reports SET status = ?, officer_notes = ?, penalty_amount = ?, updated_at = NOW() WHERE id = ?');
+    $update = $pdo->prepare('UPDATE reports SET status = ?, officer_notes = ?, penalty_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
     $update->execute([$status, $notes, $penalty, $id]);
     if ($old['status'] !== $status) {
-        $history = $pdo->prepare('INSERT INTO report_status_history (report_id, old_status, new_status, notes, changed_by, changed_at) VALUES (?, ?, ?, ?, ?, NOW())');
+        $history = $pdo->prepare('INSERT INTO report_status_history (report_id, old_status, new_status, notes, changed_by, changed_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)');
         $history->execute([$id, $old['status'], $status, $notes, (int)current_admin()['id']]);
     } else {
-        $history = $pdo->prepare('INSERT INTO report_status_history (report_id, old_status, new_status, notes, changed_by, changed_at) VALUES (?, ?, ?, ?, ?, NOW())');
+        $history = $pdo->prepare('INSERT INTO report_status_history (report_id, old_status, new_status, notes, changed_by, changed_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)');
         $history->execute([$id, $old['status'], $status, 'Review note updated: ' . $notes, (int)current_admin()['id']]);
     }
     $pdo->commit();
