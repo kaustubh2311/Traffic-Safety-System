@@ -1,10 +1,11 @@
 <?php
-// Local development settings. Update these if your XAMPP database credentials differ.
-define('DB_HOST', '127.0.0.1');
-define('DB_NAME', 'traffic_safety_db');
-define('DB_USER', 'root');
-define('DB_PASS', ''); // Standard local XAMPP installs often have an empty root password.
+// Database settings can be supplied by Vercel environment variables.
+// Local XAMPP values remain the default for development.
+define('DB_HOST', getenv('DB_HOST') !== false ? getenv('DB_HOST') : '127.0.0.1');
+define('DB_NAME', getenv('DB_NAME') !== false ? getenv('DB_NAME') : 'traffic_safety_db');
+define('DB_USER', getenv('DB_USER') !== false ? getenv('DB_USER') : 'root');
+define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 
-// Keep the project folder named "traffic-safety-system" inside htdocs.
-// If you rename the folder, update this path (no trailing slash).
-define('BASE_URL', '/traffic-safety-system');
+// A Vercel deployment uses paths at the domain root. XAMPP uses the project subfolder.
+$configuredBaseUrl = getenv('BASE_URL');
+define('BASE_URL', $configuredBaseUrl !== false ? rtrim($configuredBaseUrl, '/') : (getenv('VERCEL') !== false ? '' : '/traffic-safety-system'));
