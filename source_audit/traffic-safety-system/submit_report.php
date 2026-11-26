@@ -65,13 +65,17 @@ if (isset($_FILES['evidence']) && $_FILES['evidence']['error'] !== UPLOAD_ERR_NO
         if (!isset($allowed[$mime])) {
             $errors[] = 'Upload a JPG, PNG or WebP image only.';
         } else {
-            $storageDir = __DIR__ . '/storage/evidence';
+            $storageDir = getenv('VERCEL') !== false
+                ? sys_get_temp_dir() . '/traffic_safety_evidence'
+                : __DIR__ . '/storage/evidence';
             if (!is_dir($storageDir) && !mkdir($storageDir, 0750, true) && !is_dir($storageDir)) {
                 $errors[] = 'Evidence storage is unavailable. Please contact the project administrator.';
             } else {
                 $filename = bin2hex(random_bytes(24)) . '.' . $allowed[$mime];
                 $uploadedAbsolutePath = $storageDir . '/' . $filename;
-                $evidenceRelativePath = 'storage/evidence/' . $filename;
+                $evidenceRelativePath = getenv('VERCEL') !== false
+                    ? 'tmp/traffic_safety_evidence/' . $filename
+                    : 'storage/evidence/' . $filename;
                 if (!move_uploaded_file($file['tmp_name'], $uploadedAbsolutePath)) {
                     $errors[] = 'The photograph could not be saved. Try again.';
                     $uploadedAbsolutePath = null;

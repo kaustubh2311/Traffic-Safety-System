@@ -66,5 +66,5 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-<section class="notice-panel"><div class="notice-symbol">i</div><div><strong>Academic prototype notice</strong><p>Submitted reports are user-provided allegations, not confirmed violations. This application does not connect to police systems and cannot issue official challans or collect fines. Any penalty figure is illustrative until confirmed by an authorised authority.</p></div></section>
+<section class="notice-panel"><div class="notice-symbol">i</div><div><strong>Responsible reporting notice</strong><p>Submitted reports are user-provided reports, not confirmed violations. This application does not connect to police systems and cannot issue official challans or collect fines. Any penalty figure is illustrative until confirmed by an authorised authority.</p></div></section>
 <?php require __DIR__ . '/includes/footer.php'; ?>

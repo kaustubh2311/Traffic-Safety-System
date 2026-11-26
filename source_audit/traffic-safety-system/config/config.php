@@ -10,3 +10,5 @@ define('DB_PORT', getenv('DB_PORT') !== false ? getenv('DB_PORT') : '3306');
 // A Vercel deployment uses paths at the domain root. XAMPP uses the project subfolder.
 $configuredBaseUrl = getenv('BASE_URL');
 define('BASE_URL', $configuredBaseUrl !== false ? rtrim($configuredBaseUrl, '/') : (getenv('VERCEL') !== false ? '' : '/traffic-safety-system'));
+
+date_default_timezone_set('Asia/Kolkata');

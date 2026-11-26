@@ -1,6 +1,6 @@
 # Team 6 — Intelligent Traffic Violation Reporting and Road Safety Management System
 
-A beginner-friendly PHP + MySQL/MariaDB academic prototype for local use with XAMPP.
+A PHP + MySQL/MariaDB traffic safety management system for local and hosted use.
 
 ## Included features
 
@@ -28,7 +28,7 @@ A beginner-friendly PHP + MySQL/MariaDB academic prototype for local use with XA
 3. Open `http://localhost/phpmyadmin/` in your browser.
 4. Select **Import**, choose `database/schema.sql` from this project folder, and click **Import** / **Go**. The script creates `traffic_safety_db` and the required tables.
 5. Open `http://localhost/traffic-safety-system/setup_admin.php`.
-6. Create the first administrator with your own name, email and a strong password (10+ characters). No default admin password is included.
+6. Create the first administrator with your own name, email and password (4+ characters). No default admin password is included.
 7. **Delete `setup_admin.php` from the project folder once the account is created.** The page also disables itself once an authority account exists, but deleting it is recommended.
 8. Open `http://localhost/traffic-safety-system/` to view the homepage.
 9. Submit a test report at `http://localhost/traffic-safety-system/report.php`.
@@ -54,7 +54,7 @@ A beginner-friendly PHP + MySQL/MariaDB academic prototype for local use with XA
 
 ## Project limitations and responsible use
 
-- This is an academic prototype. It is not connected to a police database, vehicle-registration system, payment gateway or government challan service.
+- This system is not connected to a police database, vehicle-registration system, payment gateway or government challan service.
 - “Verified” is an internal demo workflow status and does not mean a legal offence has been established.
 - `penalty_amount` is an optional illustrative estimate only. Do not use it to demand payment or issue an official fine.
 - Analytics count reports and group the location text entered by reporters. They do not establish verified accident hotspots.

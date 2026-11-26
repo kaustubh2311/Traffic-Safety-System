@@ -31,7 +31,7 @@ $errorMessage = flash('error');
     <div class="nav-wrap">
         <a class="brand" href="<?= e(url()) ?>" aria-label="Traffic Safety System home">
             <span class="brand-mark">T6</span>
-            <span><strong>TrafficSafe</strong><small>Team 6 project prototype</small></span>
+            <span><strong>TrafficSafe</strong><small>Team 6 road safety system</small></span>
         </a>
         <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
         <nav class="main-nav" aria-label="Main navigation">
