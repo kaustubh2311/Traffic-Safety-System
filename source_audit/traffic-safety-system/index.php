@@ -1,4 +1,14 @@
 <?php
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$routeFile = __DIR__ . rtrim($requestPath, '/');
+if ($requestPath !== '/' && is_file($routeFile . '.php')) {
+    require $routeFile . '.php';
+    exit;
+}
+if ($requestPath !== '/' && is_file($routeFile)) {
+    require $routeFile;
+    exit;
+}
 require_once __DIR__ . '/includes/bootstrap.php';
 $pageTitle = 'Home';
 try {
