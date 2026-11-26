@@ -21,4 +21,6 @@ Thumbs.db
 *.sql.gz
 *.sqlite
 *.sqlite3
-`n# Project archive`n*.zip
+
+# Project archives
+*.zip
